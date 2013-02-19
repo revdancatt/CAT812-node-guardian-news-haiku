@@ -32,10 +32,11 @@ if (fs.existsSync('./guardian.key')) {
     control.init(fs.readFileSync('./guardian.key'), 'utf-8');
 
 } else {
-    console.log('>> Don\'t have file'.error);
-    console.log('>> Try starting server with: node server.js --guardian.api=your-api-key'.help);
-    console.log('>> You only need to do that once.'.help);
-    process.exit(0);
+
+    //  start it up and send over null
+    console.log('>> Please visit the server in a web browser to enter your guardian API key.'.help);
+    control.init(null);
+
 };
 
 
@@ -56,14 +57,22 @@ http.createServer(function (request, response) {
 
     //  Let the user know the current status of the server.
     request.on('end', function () {
-        control.count++;
-        response.writeHead(200, {'Content-Type': 'text/plain'});
-        response.end(control.guardian.key + ' : ' + control.count.toString());
+
+        //  If we don't have a guardian api key then we need to
+        //  ask the user for one.
+        if (control.guardian.key == null) {
+          response.writeHead(200, {'Content-Type': 'text/html'});
+          response.write('You need to enter a Guardian API key<br />');
+          response.end();
+        } else {
+          control.count++;
+          response.writeHead(200, {'Content-Type': 'text/plain'});
+          response.end(control.guardian.key + ' : ' + control.count.toString());
+        }
     });
 
 }).listen(1337);
 
 
-console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow);
-console.log('Server running at http://127.0.0.1:1337/');
+console.log('Server running at http://127.0.0.1:1337/'.info);
 console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow);
