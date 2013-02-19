@@ -1,0 +1,15 @@
+{
+  "name": "CAT812-node-guardian-news-haiku",
+  "subdomain": "revdancatt.CAT812-node-guardian-news-haiku",
+  "scripts": {
+    "start": "./server.js"
+  },
+  "version": "0.0.1-10",
+  "engines": {
+    "node": "0.8.x"
+  },
+  "dependencies": {
+    "colors": ">= 0.6.0-1",
+    "optimist": "0.3.x"
+  }
+}
