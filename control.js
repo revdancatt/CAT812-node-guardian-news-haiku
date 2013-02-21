@@ -7,14 +7,8 @@ control = {
 
     init: function(key) {
 
-        //  if we have been passed over a null key, then don't do anything
-        if (key === null) {
-            return;
-        }
-
-        //  otherwise setup all the things!!
+        //  set up all the things
         this.guardian.key = key;
-
         this.count = 6;
 
     }
