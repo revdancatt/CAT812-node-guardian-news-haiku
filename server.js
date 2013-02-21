@@ -1,7 +1,7 @@
 //  pull in all the stuff we need
-var http = require('http');
-var fs = require('fs');
+var mongodb = require('mongodb');
 var colours = require('colors');
+var http = require('http');
 var url  = require('url');
 
 console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow);
@@ -25,14 +25,74 @@ if (!('GUARDIANAPI' in process.env)) {
     process.exit(0);
 };
 
-if (!('MONGODB' in process.env)) {
-    console.log('>> You need to set you MONGODB connection thingy in your enviroment vars.'.error.bold);
-    console.log('>> MONGODB=[your mongodb connection thingy]'.error);
+if (!('MONGOHQ_URL' in process.env)) {
+    console.log('>> You need to set you MONGOHQ_URL connection thingy in your enviroment vars.'.error.bold);
+    console.log('>> MONGOHQ_URL=[your mongodb connection thingy]'.error);
     console.log('>> See: https://groups.google.com/forum/?fromgroups=#!topic/nodejs/1CnOzd352JE for more information'.error);
     process.exit(0);
 };
 //  ############################################################################
 
+var connectionUri = url.parse(process.env.MONGOHQ_URL);
+var dbName = connectionUri.pathname.replace(/^\//, '');
+
+mongodb.Db.connect(process.env.MONGOHQ_URL, function(err, client) {
+
+  if(err) {
+
+    console.log('Error opening database connection'.error);
+    process.exit(0);
+
+  } else {
+
+    console.log('Connected just fine'.info);
+
+    client.collection('widgets', function(err, collection) {
+
+      collection.remove(null, {safe: true}, function(err, result) {
+
+        if (!err) {
+          console.log('result of remove ' + result);
+
+          var widgets = []
+          var widget1 = {
+                          title: 'First Great widget',
+                          desc: 'greatest widget of all',
+                          print: 14.99
+                        };
+          widgets.push(widget1);
+
+          var widget2 = {
+                          title: 'Second Great widget',
+                          desc: 'nearly the greatest widget of all',
+                          print: 9.99
+                        };
+          widgets.push(widget2);
+
+          collection.insert(widgets, {safe: true, keepGoing: true}, function(err, result) {
+            if(err) {
+              console.log('Error 3'.error);
+              console.log(err);
+            } else {
+              console.log(result);
+              client.close();
+            }
+          });
+
+        } else {
+          console.log('Error 2'.error);
+          console.log(err);
+        }
+
+      });
+
+    });
+
+  }
+
+});
+
+console.log('>> End'.info);
 
 //  Now that we have safely got here we can carry on as though nothing is wrong
 require('./control.js');
