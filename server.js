@@ -96,8 +96,6 @@ http.createServer(function (request, response) {
     //  ########################################################################
     request.on('end', function () {
 
-        console.log(('key: ' + control.guardian.key).warn);
-
         //  If we don't have a guardian api key then we need to
         //  ask the user for one. Using a VERY BAD FORM!!!
         //  WHICH WE WILL FIX :)
