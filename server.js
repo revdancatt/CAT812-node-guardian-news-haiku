@@ -134,7 +134,7 @@ http.createServer(function (request, response) {
 
 
         //  Go grab the database info 1st, then dumpeverything else.
-        control.haikuCollection.find().toArray(function(err, haiku) {
+        control.haikuCollection.find().sort({added: -1}).toArray(function(err, haiku) {
 
           response.writeHead(200, {'Content-Type': 'text/html'});
           //response.write(control.removeWidgets() + '<br />') <--- this doesn't really work.
