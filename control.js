@@ -14,6 +14,7 @@ control = {
     processedMap: [],
     processedDict: {},
     serverStarted: new Date(),
+    lastFetched: new Date(),
     fetchLatestArticlesTmr: null,
 
     init: function(key) {
@@ -37,6 +38,7 @@ control = {
 
         console.log('In fetchLatestArticles()'.info);
         console.log('========================'.info.bold);
+        this.lastFetched = new Date();
 
         //  Go find *NOT* liveblogs in the uk or world sections (which are the two main "news" sections)
         var url = 'http://content.guardianapis.com/search?page-size=20&tag=type/article,-tone%2Fminutebyminute&section=uk%7Cworld&format=json&api-key=' + this.guardian.key;
@@ -94,6 +96,27 @@ control = {
             console.log(('>> ' + counter + ' new records added').info);
         }
         console.log('========================'.info.bold);
+
+    },
+
+    processQueue: function() {
+
+        //  if there's nothing to do we'll get off here
+        if (this.processMap.length == 0) {
+            console.log('>> All records processed'.info);
+            return;
+        }
+
+        //  Otherwise we need to get an item from the array
+        //  and fetch more details from the guardian API.
+        //  So remove the id from the map and the object
+        //  from the dict.
+        var id = this.processMap.shift();
+        var miniJSON = this.processDict[id];
+        delete this.processDict[id];
+
+        console.log(('>> got id: ' + id).info);
+        console.log(miniJSON);
 
     }
 

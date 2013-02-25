@@ -77,6 +77,23 @@ http.createServer(function (request, response) {
         return;
     }
 
+
+    //  Force a fetch of the articles
+    if (request.url === '/processQueue') {
+
+        //  For the moment go and fetch the latest articles here
+        //  this will normally be on an interval
+        control.processQueue();
+
+        response.writeHead(200, {'Content-Type': 'text/html'});
+        response.write('Processing queue<br />');
+        response.write('<p>');
+        response.write('<a href="/">Go Back</a>');
+        response.write('</p>');
+        response.end();
+        return;
+    }
+
     //  ########################################################################
     //
     //  THIS IS THE ONE WE REALLY CARE ABOUT, as it will...
@@ -90,7 +107,10 @@ http.createServer(function (request, response) {
         response.writeHead(200, {'Content-Type': 'text/html'});
         //response.write(control.removeWidgets() + '<br />') <--- this doesn't really work.
 
-        response.write('Server started: ' + control.serverStarted.toString());
+        var lastFetched = Math.floor((new Date() - control.lastFetched)/1000);
+        response.write('Server started: ' + control.serverStarted.toString() + '<br />');
+        response.write('Last fetched: ' + lastFetched.toString() + ' seconds ago<br />');
+
         response.write('<ol>');
         for (i in control.processMap) {
           response.write('<li>' + control.processDict[control.processMap[i]].webPublicationDate + ' - ' + control.processMap[i] + '</li>');
@@ -99,7 +119,7 @@ http.createServer(function (request, response) {
         response.write('Remaining in todo list: ' + control.processMap.length.toString() + '<br />');
         response.write('Counter : ' + control.count.toString() + '<br />');
         response.write('<p>');
-        response.write('<a href="/queueArticles">Queue articles</a><br />');
+        response.write('<a href="/processQueue">Process queue</a> | <a href="/queueArticles">Queue articles</a><br />');
         response.write('</p>');
         response.end();
 
