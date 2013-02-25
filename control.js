@@ -42,7 +42,8 @@ control = {
         this.lastFetched = new Date();
 
         //  Go find *NOT* liveblogs in the uk or world sections (which are the two main "news" sections)
-        var url = 'http://content.guardianapis.com/search?page-size=20&tag=type/article,-tone%2Fminutebyminute&section=uk%7Cworld&format=json&api-key=' + this.guardian.key;
+        //var url = 'http://content.guardianapis.com/search?page-size=20&tag=type/article,-tone%2Fminutebyminute&section=uk%7Cworld&format=json&api-key=' + this.guardian.key;
+        var url = 'http://content.guardianapis.com/search?page-size=20&tag=type/article,-tone%2Fminutebyminute&format=json&api-key=' + this.guardian.key;
 
         //  Go and fetch the results
         http.get(url, function(response) {
