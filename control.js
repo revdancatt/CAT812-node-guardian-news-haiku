@@ -334,7 +334,8 @@ control = {
                     webTitle: this.processedDict[id].webTitle,
                     webPublicationDay: this.processedDict[id].webPublicationDay,
                     webPublicationTime: this.processedDict[id].webPublicationTime,
-                    added: new Date()
+                    added: new Date(),
+                    backfilled: 0
                 }
 
                 //  Pop this into the database, we don't really care what happens unless there's an error
