@@ -314,7 +314,7 @@ control = {
         var lastWord = row[2].words.pop();
         row[2].words.push(lastWord);
 
-        if (firstWord == firstWord.toUpperCase() && '0123456789'.indexOf(firstWord[0]) == -1) {
+        if ('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.indexOf(firstWord[0]) != -1) { // < 'cause regex is hard ;)
             if (lastWord.indexOf('.') >= 0 || lastWord.indexOf('?') >= 0 || lastWord.indexOf('!') >= 0) {
                 console.log((id).info);
                 console.log((row[0].words.join(' ')).haiku);
