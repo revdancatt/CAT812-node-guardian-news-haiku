@@ -95,51 +95,6 @@ control = {
         }
         console.log('========================'.info.bold);
 
-    },
-
-
-    //  Old code that I'm keeping around for the moment
-    removeWidgets: function() {
-
-        control.widgetsCollection.remove(null, {safe: true}, function(err, result) {
-            if (err) {
-                console.log('>> Failed to remove Widgets'.warning);
-            } else {
-                //  QUESTION: This gets called twice, work out why.
-                console.log(('>> ' + result + ' records removed').info);
-            }
-        });
-
-    },
-
-    //  Old code that I'm keeping around for the moment
-    saveWidgets: function() {
-
-        var widgets = []
-        var widget1 = {
-                  title: 'First Great widget',
-                  desc: 'greatest widget of all',
-                  print: 14.99
-                };
-        widgets.push(widget1);
-
-        var widget2 = {
-                  title: 'Second Great widget',
-                  desc: 'nearly the greatest widget of all',
-                  print: 9.99
-                };
-        widgets.push(widget2);
-
-        this.widgetsCollection.insert(widgets, {safe: true, keepGoing: true}, function(err, result) {
-            if(err) {
-                console.log('Error 3'.error);
-                console.log(err);
-            } else {
-                console.log(result);
-                control.mdb.close();
-            }
-        });
-
     }
 
 }

@@ -33,41 +33,6 @@ if (!('MONGOHQ_URL' in process.env)) {
 };
 //  ############################################################################
 
-/*
-//  We're not actually doing any of this at the moment
-var connectionUri = url.parse(process.env.MONGOHQ_URL);
-var dbName = connectionUri.pathname.replace(/^\//, '');
-
-mongodb.Db.connect(process.env.MONGOHQ_URL, function(err, mdb) {
-
-  if(err) {
-
-    console.log('Error opening database connection'.error);
-    process.exit(0);
-
-  } else {
-
-    require('./control.js');
-    control.init(process.env.GUARDIANAPI);
-    console.log('Connected just fine'.info);
-
-    control.mdb = mdb;
-
-    mdb.collection('widgets', function(err, collection) {
-      if (!err) {
-        control.widgetsCollection = collection;
-      } else {
-        console.log('Error connecting to collection'.error);
-        process.exit(0);
-      }
-    });
-
-    control.saveWidgets();
-
-  }
-
-});
-*/
 
 require('./control.js');
 control.init(process.env.GUARDIANAPI);
