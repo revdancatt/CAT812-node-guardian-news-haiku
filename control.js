@@ -196,7 +196,7 @@ control = {
         json.bodyNumbers = [];
 
         for (word in json.body) {
-            json.bodyNumbers.push(this.cheapSyllables(json.body[word].replace('.', '').replace('?', '').replace('!', '')));
+            json.bodyNumbers.push(this.cheapSyllables(json.body[word].replace('.', '').replace('?', '').replace('!', '').replace('\'', '')));
         }
 
         delete json.fields;
