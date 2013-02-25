@@ -12,7 +12,8 @@ colours.setTheme({
   help: 'cyan',
   warn: 'yellow',
   debug: 'blue',
-  error: 'red'
+  error: 'red',
+  haiku: 'magenta'
 });
 
 //  ############################################################################
@@ -110,6 +111,7 @@ http.createServer(function (request, response) {
         var lastFetched = Math.floor((new Date() - control.lastFetched)/1000);
         response.write('Server started: ' + control.serverStarted.toString() + '<br />');
         response.write('Last fetched: ' + lastFetched.toString() + ' seconds ago<br />');
+        response.write('<hr>');
 
         response.write('<ol>');
         for (i in control.processMap) {
@@ -117,6 +119,16 @@ http.createServer(function (request, response) {
         }
         response.write('</ol>')
         response.write('Remaining in todo list: ' + control.processMap.length.toString() + '<br />');
+        response.write('<hr>');
+
+        response.write('<ol>');
+        for (i in control.processedMap) {
+          response.write('<li>' + control.processedDict[control.processedMap[i]].webPublicationDate + ' - ' + control.processedMap[i] + '</li>');
+        }
+        response.write('</ol>')
+        response.write('Total in prcessed list: ' + control.processedMap.length.toString() + '<br />');
+        response.write('<hr>');
+
         response.write('Counter : ' + control.count.toString() + '<br />');
         response.write('<p>');
         response.write('<a href="/processQueue">Process queue</a> | <a href="/queueArticles">Queue articles</a><br />');
