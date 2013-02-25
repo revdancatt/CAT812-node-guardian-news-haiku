@@ -335,6 +335,7 @@ control = {
                 var haikuDict = {
                     id: rowId,
                     row: row,
+                    rawId: id,
                     webUrl: this.processedDict[id].webUrl,
                     webTitle: this.processedDict[id].webTitle,
                     webPublicationDay: this.processedDict[id].webPublicationDay,
