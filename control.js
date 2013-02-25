@@ -17,6 +17,9 @@ control = {
     lastFetched: new Date(),
     fetchLatestArticlesTmr: null,
 
+    mdb: null,
+    haikuCollection: null,
+
     init: function(key) {
 
         //  set up all the things
@@ -318,21 +321,41 @@ control = {
         var lastWord = row[2].words.pop();
         row[2].words.push(lastWord);
 
-        if (firstWord == firstWord.toUpperCase() && (lastWord.indexOf('.') >= 0 || lastWord.indexOf('?') >= 0 || lastWord.indexOf('!') >= 0)) {
-            console.log((id).info);
-            console.log((row[0].words.join(' ')).haiku);
-            console.log((row[1].words.join(' ')).haiku);
-            console.log((row[2].words.join(' ')).haiku);
-            console.log((row[0].syllables.join(' ')).data);
-            console.log((row[1].syllables.join(' ')).data);
-            console.log((row[2].syllables.join(' ')).data);
-            console.log('----------');
+        if (firstWord == firstWord.toUpperCase()) {
+            if (lastWord.indexOf('.') >= 0 || lastWord.indexOf('?') >= 0 || lastWord.indexOf('!') >= 0) {
+                console.log((id).info);
+                console.log((row[0].words.join(' ')).haiku);
+                console.log((row[1].words.join(' ')).haiku);
+                console.log((row[2].words.join(' ')).haiku);
+                console.log('----------');
 
-            //  Pop this into the database
+                var rows = [row[0].words.join('+'), row[1].words.join('+'), row[2].words.join('+')];
+                var rowId = rows.join('+').replace(/\\/g, '');
 
-            //  return true
-            return true;
+                var haikuDict = {
+                    id: rowId,
+                    row: row,
+                    webUrl: this.processedDict[id].webUrl,
+                    webTitle: this.processedDict[id].webTitle,
+                    webPublicationDay: this.processedDict[id].webPublicationDay,
+                    webPublicationTime: this.processedDict[id].webPublicationTime
+                }
 
+                //  Pop this into the database, we don't really care what happens unless there's an error
+                this.haikuCollection.update({id: rowId}, haikuDict, {upsert: true, safe: true, keepGoing: true}, function(err, result) {
+                    if(err) {
+                        console.log('>> Error when putting content into the database.'.error);
+                        console.log(err);
+                    } else {
+                        console.log()
+                        control.mdb.close();
+                    }
+                });
+
+                //  return true
+                return true;
+
+            }
         }
 
         return false;
