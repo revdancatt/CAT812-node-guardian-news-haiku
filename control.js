@@ -195,6 +195,7 @@ control = {
         json.body = json.body.split(' ');
         json.bodyNumbers = [];
 
+        //  put the word in with some bits stripped off
         for (word in json.body) {
             json.bodyNumbers.push(this.cheapSyllables(json.body[word].replace('.', '').replace('?', '').replace('!', '').replace('\'', '')));
         }
