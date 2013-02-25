@@ -97,14 +97,6 @@ control = {
             }
         }
 
-        if (counter > 0) {
-            if (counter == 1) {
-                console.log('>> 1 new record added'.info);
-            } else {
-                console.log(('>> ' + counter + ' new records added').info);
-            }
-        }
-
     },
 
 
@@ -322,7 +314,7 @@ control = {
         var lastWord = row[2].words.pop();
         row[2].words.push(lastWord);
 
-        if (firstWord == firstWord.toUpperCase()) {
+        if (firstWord == firstWord.toUpperCase() && '0123456789'.indexOf(firstWord[0]) == -1) {
             if (lastWord.indexOf('.') >= 0 || lastWord.indexOf('?') >= 0 || lastWord.indexOf('!') >= 0) {
                 console.log((id).info);
                 console.log((row[0].words.join(' ')).haiku);
@@ -341,7 +333,8 @@ control = {
                     webUrl: this.processedDict[id].webUrl,
                     webTitle: this.processedDict[id].webTitle,
                     webPublicationDay: this.processedDict[id].webPublicationDay,
-                    webPublicationTime: this.processedDict[id].webPublicationTime
+                    webPublicationTime: this.processedDict[id].webPublicationTime,
+                    added: new Date()
                 }
 
                 //  Pop this into the database, we don't really care what happens unless there's an error

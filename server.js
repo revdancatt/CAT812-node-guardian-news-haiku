@@ -132,35 +132,71 @@ http.createServer(function (request, response) {
 
         control.count++;
 
-        response.writeHead(200, {'Content-Type': 'text/html'});
-        //response.write(control.removeWidgets() + '<br />') <--- this doesn't really work.
 
-        var lastFetched = Math.floor((new Date() - control.lastFetched)/1000);
-        response.write('Server started: ' + control.serverStarted.toString() + '<br />');
-        response.write('Last fetched: ' + lastFetched.toString() + ' seconds ago<br />');
-        response.write('<hr>');
+        //  Go grab the database info 1st, then dumpeverything else.
+        control.haikuCollection.find().toArray(function(err, haiku) {
 
-        response.write('<ol>');
-        for (i in control.processMap) {
-          response.write('<li>' + control.processDict[control.processMap[i]].webPublicationDate + ' - ' + control.processMap[i] + '</li>');
-        }
-        response.write('</ol>')
-        response.write('Remaining in todo list: ' + control.processMap.length.toString() + '<br />');
-        response.write('<hr>');
+          response.writeHead(200, {'Content-Type': 'text/html'});
+          //response.write(control.removeWidgets() + '<br />') <--- this doesn't really work.
+          response.write('<!DOCTYPE html>');
+          response.write('<html lang="en">');
+          response.write('<head>');
+          response.write('  <meta charset="utf-8" />');
+          response.write('</head>');
+          response.write('<body>');
 
-        response.write('<ol>');
-        for (i in control.processedMap) {
-          response.write('<li>' + control.processedDict[control.processedMap[i]].webPublicationDate + ' - ' + control.processedMap[i] + '</li>');
-        }
-        response.write('</ol>')
-        response.write('Total in prcessed list: ' + control.processedMap.length.toString() + '<br />');
-        response.write('<hr>');
+          var lastFetched = Math.floor((new Date() - control.lastFetched)/1000);
+          response.write('Server started: ' + control.serverStarted.toString() + '<br />');
+          response.write('Last fetched: ' + lastFetched.toString() + ' seconds ago<br />');
+          response.write('<hr>');
 
-        response.write('Counter : ' + control.count.toString() + '<br />');
-        response.write('<p>');
-        response.write('<a href="/processQueue">Process queue</a> | <a href="/queueArticles">Queue articles</a><br />');
-        response.write('</p>');
-        response.end();
+          response.write('<ol>');
+          for (i in haiku) {
+            response.write('<li>');
+            response.write('<a href="' + haiku[i].webUrl + '">' + haiku[i].webTitle + '</a><br />');
+            response.write(haiku[i].row[0].words.join(' ') + '<br />');
+            response.write(haiku[i].row[1].words.join(' ') + '<br />');
+            response.write(haiku[i].row[2].words.join(' ') + '<br />');
+            response.write('<a href="https://sentynel.com/haiku/validate?haikutext=' 
+              + haiku[i].row[0].words.join('+') + '+' 
+              + haiku[i].row[1].words.join('+') + '+' 
+              + haiku[i].row[2].words.join('+')
+              + '">check</a><br />');
+            response.write('<small>' + haiku[i].added.toString() + '</small><br />');
+            response.write('<br />');
+            response.write('</li>');
+          }
+          response.write('</ol>');
+          response.write('<hr>');
+
+          response.write('<ol>');
+          for (i in control.processMap) {
+            response.write('<li>' + control.processDict[control.processMap[i]].webPublicationDate + ' - ' + control.processMap[i] + '</li>');
+          }
+          response.write('</ol>')
+          response.write('Remaining in todo list: ' + control.processMap.length.toString() + '<br />');
+          response.write('<hr>');
+
+          response.write('<ol>');
+          for (i in control.processedMap) {
+            response.write('<li>' + control.processedDict[control.processedMap[i]].webPublicationDate + ' - ' + control.processedMap[i] + '</li>');
+          }
+          response.write('</ol>')
+          response.write('Total in prcessed list: ' + control.processedMap.length.toString() + '<br />');
+          response.write('<hr>');
+
+          response.write('Counter : ' + control.count.toString() + '<br />');
+          response.write('<p>');
+          response.write('<a href="/processQueue">Process queue</a> | <a href="/queueArticles">Queue articles</a><br />');
+          response.write('</p>');
+
+          response.write('</body>');
+          response.write('</html>');
+
+          response.end();
+
+
+        })
 
     });
 
