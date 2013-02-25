@@ -33,10 +33,12 @@ if (!('MONGOHQ_URL' in process.env)) {
 };
 //  ############################################################################
 
+/*
+//  We're not actually doing any of this at the moment
 var connectionUri = url.parse(process.env.MONGOHQ_URL);
 var dbName = connectionUri.pathname.replace(/^\//, '');
 
-mongodb.Db.connect(process.env.MONGOHQ_URL, function(err, client) {
+mongodb.Db.connect(process.env.MONGOHQ_URL, function(err, mdb) {
 
   if(err) {
 
@@ -45,58 +47,34 @@ mongodb.Db.connect(process.env.MONGOHQ_URL, function(err, client) {
 
   } else {
 
+    require('./control.js');
+    control.init(process.env.GUARDIANAPI);
     console.log('Connected just fine'.info);
 
-    client.collection('widgets', function(err, collection) {
+    control.mdb = mdb;
 
-      collection.remove(null, {safe: true}, function(err, result) {
-
-        if (!err) {
-          console.log('result of remove ' + result);
-
-          var widgets = []
-          var widget1 = {
-                          title: 'First Great widget',
-                          desc: 'greatest widget of all',
-                          print: 14.99
-                        };
-          widgets.push(widget1);
-
-          var widget2 = {
-                          title: 'Second Great widget',
-                          desc: 'nearly the greatest widget of all',
-                          print: 9.99
-                        };
-          widgets.push(widget2);
-
-          collection.insert(widgets, {safe: true, keepGoing: true}, function(err, result) {
-            if(err) {
-              console.log('Error 3'.error);
-              console.log(err);
-            } else {
-              console.log(result);
-              client.close();
-            }
-          });
-
-        } else {
-          console.log('Error 2'.error);
-          console.log(err);
-        }
-
-      });
-
+    mdb.collection('widgets', function(err, collection) {
+      if (!err) {
+        control.widgetsCollection = collection;
+      } else {
+        console.log('Error connecting to collection'.error);
+        process.exit(0);
+      }
     });
+
+    control.saveWidgets();
 
   }
 
 });
+*/
+
+require('./control.js');
+control.init(process.env.GUARDIANAPI);
 
 console.log('>> End'.info);
 
 //  Now that we have safely got here we can carry on as though nothing is wrong
-require('./control.js');
-control.init(process.env.GUARDIANAPI);
 
 //  ############################################################################
 //  
@@ -118,6 +96,22 @@ http.createServer(function (request, response) {
         return;
     }
 
+    //  Force a fetch of the articles
+    if (request.url === '/queueArticles') {
+
+        //  For the moment go and fetch the latest articles here
+        //  this will normally be on an interval
+        control.fetchLatestArticles();
+
+        response.writeHead(200, {'Content-Type': 'text/html'});
+        response.write('New articles have been queued<br />');
+        response.write('<p>');
+        response.write('<a href="/">Go Back</a>');
+        response.write('</p>');
+        response.end();
+        return;
+    }
+
     //  ########################################################################
     //
     //  THIS IS THE ONE WE REALLY CARE ABOUT, as it will...
@@ -127,8 +121,22 @@ http.createServer(function (request, response) {
     request.on('end', function () {
 
         control.count++;
-        response.writeHead(200, {'Content-Type': 'text/plain'});
-        response.end('Hello brave new world : ' + control.count.toString());
+
+        response.writeHead(200, {'Content-Type': 'text/html'});
+        //response.write(control.removeWidgets() + '<br />') <--- this doesn't really work.
+
+        response.write('Server started: ' + control.serverStarted.toString());
+        response.write('<ol>');
+        for (i in control.processMap) {
+          response.write('<li>' + control.processDict[control.processMap[i]].webPublicationDate + ' - ' + control.processMap[i] + '</li>');
+        }
+        response.write('</ol>')
+        response.write('Remaining in todo list: ' + control.processMap.length.toString() + '<br />');
+        response.write('Counter : ' + control.count.toString() + '<br />');
+        response.write('<p>');
+        response.write('<a href="/queueArticles">Queue articles</a><br />');
+        response.write('</p>');
+        response.end();
 
     });
 
