@@ -1,4 +1,5 @@
 var http = require('http');
+var https = require('https');
 
 control = {
 
@@ -16,6 +17,7 @@ control = {
     serverStarted: new Date(),
     lastFetched: new Date(),
     fetchLatestArticlesTmr: null,
+    validateTmr: null,
 
     mdb: null,
     haikuCollection: null,
@@ -29,6 +31,11 @@ control = {
         //  Set the fetchLatestArticles onto a intereval
         this.fetchLatestArticlesTmr = setInterval(function() {
             control.fetchLatestArticles();
+        }, 1000 * 60);
+
+        //  and another one to validate articles
+        this.validateTmr = setInterval(function() {
+            control.validateHaikuRemote();
         }, 1000 * 60);
 
         //  Add call is anyway to kick things off
@@ -358,6 +365,77 @@ control = {
 
         return false;
 
+    },
+
+    //  This function is now going to call the remote haiku validation page to see if
+    //  *they* think one is valid, if se we mark it as valid, otherwise we remove it
+    validateHaikuRemote: function() {
+
+        this.haikuCollection.findOne({valid: false}, function(err, haiku) {
+
+            //  If there was an error finding one, dump it to the console
+            if (err) {
+                console.log('>> Something bad happened in validateHaikuRemote'.warn);
+                console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow);
+                return;
+            }
+
+            //  if there are none left then quit here
+            if (haiku === null) {
+                return;
+            }
+
+
+            //  Now that we have one I want to go fetch the remote validaton page and see what we have
+            var id = haiku.id;
+            var rawId = haiku.rawId;
+            var url = 'https://sentynel.com/haiku/validate?haikutext='  + id;
+
+            //  fetch it
+            https.get(url, function(response) {
+
+                var output = '';
+
+                //  build up the output
+                response.on('data', function(chunk) {
+                    output += chunk;
+                });
+
+                //  once we have everything
+                response.on('end', function() {
+
+                    //  if it is valid then we need to set the haiku to valid
+                    //  otherwise we delete it
+                    if (output.indexOf('Valid!') > -1) {
+
+                        //  set the valid to true
+                        control.haikuCollection.update({id: id}, {$set : {valid: true}}, {safe: true}, function(err) {
+                            if (err) {
+                                console.log('>> error updating Haiku!'.warn);
+                            }
+                        })
+
+                    } else {
+
+                        //  remove it
+                        control.haikuCollection.remove({id: id}, function(err) {
+                            if (err) {
+                                console.log('>> error removing Haiku!'.warn);
+                            }
+                        })
+                    }
+                });
+
+            }).on('error', function(e) {
+                //  TODO: Make sure this doesn't stop everything from ticking over.
+                console.log(('>> Something bad happened in validateHaikuRemote: ' + e.message).error);
+                console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow);
+            });
+
+
+        });
+
+    
     },
 
     cheapSyllables: function(word) {

@@ -122,6 +122,25 @@ http.createServer(function (request, response) {
         return;
     }
 
+
+    //  Cull old haiku
+    if (request.url === '/validateHaiku') {
+
+        //  For the moment go and fetch the latest articles here
+        //  this will normally be on an interval
+        control.validateHaikuRemote();
+
+        response.writeHead(200, {'Content-Type': 'text/html'});
+        response.write('Validating Haiku<br />');
+        response.write('<p>');
+        response.write('<a href="/">Go Back</a>');
+        response.write('</p>');
+        response.end();
+        return;
+
+    }
+
+
     //  ########################################################################
     //
     //  THIS IS THE ONE WE REALLY CARE ABOUT, as it will...
@@ -134,7 +153,7 @@ http.createServer(function (request, response) {
 
 
         //  Go grab the database info 1st, then dumpeverything else.
-        control.haikuCollection.find().sort({added: -1}).toArray(function(err, haiku) {
+        control.haikuCollection.find({valid: true}).sort({added: -1}).toArray(function(err, haiku) {
 
           response.writeHead(200, {'Content-Type': 'text/html'});
           //response.write(control.removeWidgets() + '<br />') <--- this doesn't really work.
