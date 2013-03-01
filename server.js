@@ -165,6 +165,8 @@ http.createServer(function (request, response) {
           response.write('</head>');
           response.write('<body>');
 
+          response.write('<h2>Now with added validation</h2>');
+          
           var lastFetched = Math.floor((new Date() - control.lastFetched)/1000);
           response.write('Server started: ' + control.serverStarted.toString() + '<br />');
           response.write('Last fetched: ' + lastFetched.toString() + ' seconds ago<br />');
