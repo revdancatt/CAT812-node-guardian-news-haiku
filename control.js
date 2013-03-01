@@ -337,6 +337,7 @@ control = {
                     id: rowId,
                     row: row,
                     rawId: id,
+                    valid: false,
                     sectionName: this.processedDict[id].sectionName,
                     webUrl: this.processedDict[id].webUrl,
                     webTitle: this.processedDict[id].webTitle,
